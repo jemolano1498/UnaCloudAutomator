@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import Run.FinalStaticsVals;
 import uniandes.unacloud.agent.exceptions.PlatformOperationException;
 import uniandes.unacloud.agent.exceptions.UnsupportedPlatformException;
 import uniandes.unacloud.agent.execution.domain.Execution;
@@ -232,8 +233,7 @@ public abstract class VirtualBox extends Platform {
 	 */
 	@Override
 	public void cloneImage(String sourceImg, String destImg) {
-		LocalProcessExecutor.executeCommandOutput(getExecutablePath(), "clonevm", sourceImg, "--basefolder", "/opt/unacloud/repo/","--name",destImg+"_Je.molano1498", "--register");
-//		LocalProcessExecutor.executeCommandOutput(getExecutablePath(), "clonevm", sourceImg, "--basefolder", "/home/juanes/VirtualBox VMs/","--name", destImg+"_Je.molano1498", "--register");
+		LocalProcessExecutor.executeCommandOutput(getExecutablePath(), "clonevm", sourceImg, "--basefolder", FinalStaticsVals.FOLDER_PATH,"--name",destImg+"_"+FinalStaticsVals.USERNAME, "--register");
 		sleep(20000);
 //		takeExecutionSnapshot(dest, "unacloudbase");
 //        unregisterImage(dest);

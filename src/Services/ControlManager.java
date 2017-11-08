@@ -1,9 +1,9 @@
 package Services;
 
+import Run.FinalStaticsVals;
 import uniandes.unacloud.common.utils.UnaCloudConstants;
 import uniandes.unacloud.share.db.DatabaseConnection;
 import uniandes.unacloud.share.manager.ProjectManager;
-import uniandes.unacloud.share.queue.QueueMessageReceiver;
 import uniandes.unacloud.share.queue.QueueRabbitManager;
 import uniandes.unacloud.share.utils.EnvironmentManager;
 import uniandes.unacloud.web.queue.QueueTaskerControl;
@@ -25,25 +25,6 @@ public class ControlManager extends ProjectManager {
 	 */
 	private static final int POOL_SIZE = 5;
 
-	/**
-	 * Number of concurrent threads to process messages from physical machines
-	 */
-	private static final int CONCURRENT_THREADS_PM = 50;
-	
-	/**
-	 * Number of concurrent threads to process messages from virtual machines status
-	 */
-	private static final int CONCURRENT_THREADS_VM = 30;
-	
-	/**
-	 * Number of concurrent threads to process messages from queue
-	 */
-	private static final int CONCURRENT_THREADS_QUEUE = 50;
-	
-	/**
-	 * Number of tasks in each thread in queue processor
-	 */
-	private static final int TASK_BY_THREAD_QUEUE = 5;
 	
 	/**
 	 * Creates a project manager with all services
@@ -112,11 +93,11 @@ public class ControlManager extends ProjectManager {
 		System.out.println("Start database service");
 		connection = new DatabaseConnection();
 		connection.connect(
-				"dbunacloud", 
-				3306,
-				"157.253.236.113", 
-				"root", 
-				"adminUnaCloud",
+				FinalStaticsVals.DB_NAME, 
+				FinalStaticsVals.DB_PORT,
+				FinalStaticsVals.DB_IP, 
+				FinalStaticsVals.DB_USER, 
+				FinalStaticsVals.DB_PASSWORD,
 				POOL_SIZE);
 		connection.getConnection().close();		
 	}
@@ -127,24 +108,13 @@ public class ControlManager extends ProjectManager {
 	 */
 	@Override
 	protected void startQueueService() throws Exception {
-//		System.out.println("Start queue service " + "157.253.236.113" + ":" + "5672");
-//		QueueRabbitManager rabbitManager = new QueueRabbitManager(
-//				"admin",
-//				"adminUnaCloud", 
-//				"157.253.236.113", 
-//				5672, 
-//				UnaCloudConstants.QUEUE_CONTROL);
-//		queueReceiver = new QueueMessageReceiver();
-//		queueReceiver.createConnection(rabbitManager);
-//		processor = new QueueMessageProcessor(CONCURRENT_THREADS_QUEUE, TASK_BY_THREAD_QUEUE);
-//		queueReceiver.startReceiver(processor);		
 		QueueRabbitManager queueControl = new QueueRabbitManager(
-				"admin", 
-				"adminUnaCloud",
-				"157.253.236.113", 
-				5672, 
+				FinalStaticsVals.QUEUE_USER, 
+				FinalStaticsVals.QUEUE_PASSWORD,
+				FinalStaticsVals.QUEUE_IP, 
+				FinalStaticsVals.QUEUE_PORT, 
 				UnaCloudConstants.QUEUE_CONTROL);
-		System.out.println("Start queue service " + "157.253.236.113" + ":" + "5672");
+		System.out.println("Start queue service " + FinalStaticsVals.QUEUE_IP + ":" + FinalStaticsVals.QUEUE_PORT);
 		QueueTaskerControl.setQueueConnection(queueControl);
 	}
 	

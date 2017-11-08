@@ -2,17 +2,37 @@ package Entities;
 
 public class HardwareProfile {
 	
+	public int id;
+	
 	public String name;
 	
 	public int cores;
 	
 	public int ram;
 
-	public HardwareProfile(String name, int cores, int ram) {
-		super();
-		this.name = name;
-		this.cores = cores;
-		this.ram = ram;
+	public HardwareProfile(String type) {
+		switch (type) {
+		case ("small"): {
+			id=1;
+			cores =1;
+			ram = 1024;
+		}
+		case ("medium"):{
+			id=2;
+			cores =2;
+			ram = 1024*2;
+		}
+		case ("large"):{
+			id=3;
+			cores =4;
+			ram = 1024*4;
+		}
+		default: {
+			id=1;
+			cores =1;
+			ram = 1024;
+		}
+		}
 	}
 
 	/**

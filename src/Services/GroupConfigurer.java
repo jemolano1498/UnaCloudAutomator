@@ -11,9 +11,14 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import Services.DeploymentService;
 import Entities.Cluster;
+import Entities.HardwareProfile;
+import Entities.Image;
+import Entities.ImageRequest;
 import Entities.Node;
 import Entities.NodeGroup;
+import Run.FinalStaticsVals;
 import uniandes.unacloud.agent.platform.Platform;
 import uniandes.unacloud.agent.platform.PlatformFactory;
 import uniandes.unacloud.agent.utils.SystemUtils;
@@ -50,8 +55,6 @@ public class GroupConfigurer {
 //		try {
 //			qf.verifyDeployment(325,5);
 //		} catch (Exception e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
 //		}
 //		
 //
@@ -72,13 +75,13 @@ public class GroupConfigurer {
 			for (NodeGroup a : cluster.getNodeGroups()) {
 				if (deploymentsList.get(a.getId())==0 && a.getDependencies().isEmpty()) {
 					
-					configureGroup(a);
+					doGroupThings(a);
 					
 				}
 				else if (deploymentsList.get(a.getId())==0 && dependenciesDeployed(a.getId())) {
 					
 					fixScript (a);
-					configureGroup(a);
+					doGroupThings(a);
 				}
 			}
 		}
@@ -90,10 +93,8 @@ public class GroupConfigurer {
 	
 	public void doGroupThings (NodeGroup a) throws Exception {
 		
-		configureGroup(a);
-		
 		//FALTA LLAMAR AL ALLOCATOR y guardar el deploy_image_id
-		deployGroup();
+		DeploymentService.getInstance().deploy (cluster, FinalStaticsVals.USERNAME_ID, new Long (3600000), configureGroup(a) );
 		
 		qf.verifyDeployment(a.deployedImageId, a.getQuantity());
 		
@@ -127,46 +128,61 @@ public class GroupConfigurer {
 		return true;
 	}
 	
-	public void configureGroup (NodeGroup nodeGroup) {
+	public ImageRequest configureGroup (NodeGroup nodeGroup) {
+		
+		ImageRequest resp = null;
 				
 		String copyName = cluster.name+"_"+nodeGroup.getId();
+		
 		int imageNumber = qf.getNextImage();
+		
 		System.out.println("Register platforms");
+		
     	PlatformFactory.registerplatforms();
-    	Platform platform = PlatformFactory.getPlatform("VBox5");
-		platform.cloneImage("DebianTemplate",copyName);
+    	
+    	Platform platform = PlatformFactory.getPlatform(FinalStaticsVals.PLATFORM);
+    	
+//		platform.cloneImage(FinalStaticsVals.IMAGE_NAME,copyName);
 		
 		try {
-			platform.startExecution(copyName +"_Je.molano1498");
 			
-			platform.copyFileOnExecution(copyName +"_Je.molano1498", "/home/user/", generateGroupScript(nodeGroup));
+			String imageName = copyName +"_" + FinalStaticsVals.USERNAME;
 			
-			platform.executeCommandOnExecution(copyName +"_Je.molano1498", "/bin/bash", "/home/user/"+cluster.getId()+"_"+nodeGroup.getId()+".sh");
+//			platform.startExecution(imageName);
+//			
+//			platform.copyFileOnExecution(imageName, FinalStaticsVals.IMAGE_FOLDER_PATH, generateGroupScript(nodeGroup));
+//			
+//			platform.executeCommandOnExecution(imageName, "/bin/bash", FinalStaticsVals.IMAGE_FOLDER_PATH+cluster.getId()+"_"+nodeGroup.getId()+".sh");
+//			
+//			platform.stopExecution(imageName);
+//			
+//			platform.unregisterImage(imageName);
 			
-			platform.stopExecution(copyName +"_Je.molano1498");
-			
-			platform.unregisterImage(copyName +"_Je.molano1498");
-			
-			String folderPath = "/opt/unacloud/repo/"+copyName +"_Je.molano1498/"+copyName +"_Je.molano1498";
+			String folderPath = FinalStaticsVals.FOLDER_PATH+imageName +"/"+imageName;
 //			String folderPath = "/home/juanes/VirtualBox VMs/"+copyName +"_Je.molano1498/"+copyName +"_Je.molano1498";
 						
-			zipFile(folderPath+".vbox",folderPath+".vdi",folderPath+".zip");
+//			zipFile(folderPath+".vbox",folderPath+".vdi",folderPath+".zip");
 			
 			nodeGroup.fileRoute = folderPath+".zip";
 			
-			qf.registerImageInDB(copyName +"_Je.molano1498", "/opt/unacloud/repo/"+copyName +"_Je.molano1498/", imageNumber);
+			qf.registerImageInDB(imageName, FinalStaticsVals.FOLDER_PATH + imageName +"/", imageNumber);
 			
-			qf.createCluster(copyName +"_Je.molano1498", imageNumber);
+			qf.createCluster(cluster.name, imageNumber);
+			
+			qf.addClusterDbId(cluster);
+			
+			Image image = new Image(imageNumber, imageName, false, new Long("2311069109"), FinalStaticsVals.USERNAME_ID, FinalStaticsVals.IMAGE_PASSWORD, FinalStaticsVals.IMAGE_USERNAME, "6", "SSH", folderPath, 0, null, "AVAILABLE", null, FinalStaticsVals.PLATFORM_ID);
+			
+			cluster.setImage(image);
+				
+			resp = new ImageRequest (image, new HardwareProfile(nodeGroup.getHwp()), nodeGroup.getQuantity(), nodeGroup.getgHostName(), false);
 			
 
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
-	
-	public void deployGroup () {
 		
+		return resp;
 	}
 	
 	private void fixScript(NodeGroup a) {

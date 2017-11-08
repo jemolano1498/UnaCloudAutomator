@@ -1,6 +1,8 @@
 package Run;
 
 import java.sql.Connection;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import Entities.Cluster;
 import Entities.Node;
@@ -19,6 +21,8 @@ public class InitialPoint {
 		Connection connection = ControlManager.getInstance().getDBConnection();
 		
 		new QueryFactory(connection);
+		
+		FinalStaticsVals.USERNAME_ID = QueryFactory.getInstance().getUserId(FinalStaticsVals.USERNAME);
 		
 		JSONReader jsonReader = new JSONReader();
 		
@@ -51,6 +55,15 @@ public class InitialPoint {
 //			System.out.println(toChange);
 //			
 //		}
+//		
+//		long time = 3600000;
+//		
+//		int time2 = 3600000; 
+//		
+//		System.out.println(new Long(time));
+		
+//		System.out.println(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis())));
+		
 //	}
 	
 
