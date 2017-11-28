@@ -6,6 +6,8 @@ public class NodeGroup {
 	
 	public String id;
 	
+	public String dBId;
+	
 	public int quantity;
 	
 	public String gHostName;
@@ -24,7 +26,7 @@ public class NodeGroup {
 	
 	public ArrayList<String> dependencies;
 	
-	
+	public Image image;
 
 	public NodeGroup(String id, int quantity, String gHostName, String script, String hwp, String imageTemplate) {
 		super();
@@ -156,6 +158,14 @@ public class NodeGroup {
 	 */
 	public void setNodes(ArrayList<Node> nodes) {
 		this.nodes = nodes;
+	}
+	
+	public Image getImage() {
+		return image;
+	}
+
+	public void setImage(Image image) {
+		this.image = image;
 	}
 	
 	

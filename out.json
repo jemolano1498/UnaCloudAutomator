@@ -1,8 +1,8 @@
 {
-	"name":"BLAST611",
+	"name":"BLAST724",
 	"time":"1 Hour",
 	"cluster":{
-		"id":"59230",
+		"id":"63450",
 		"nodes":[
 			{
 				"id":"0",
@@ -10,16 +10,16 @@
 				"imageTemplate":"DebianTemplate",
 				"quantity":"1",
 				"gHostName":"BlastDB",
-				"script":"#!bin/bash \n sudo apt-get install -y curl \n #Download Chef installer \n sudo curl -L https://www.opscode.com/chef/install.sh | bash \n #Create chef node.json \n echo '{  \"run_list\": [ \"recipe[blastDB]\"  ]}' > /etc/chef/node.json \n #Define chef paths \n echo 'file_cache_path \"/etc/chef\" \n \t cookbook_path \"/etc/chef/cookbooks\" \n \t json_attribs \"/etc/chef/node.json\"' > /etc/chef/solo.rb \n #Directory for DB recipe  \n mkdir -p /etc/chef/cookbooks/blastDB/recipes \n #Blast DB recipe \n echo '%w[ /home/user/ncbi-blast-2.6.0+ /home/user/ncbi-blast-2.6.0+/blast /home/user/ncbi-blast-2.6.0+/blast/db ].each do |path| \n \t directory path do \n \t owner \"user\" \n\t group \"user\" \n\t mode \"0755\" \n\t end \n end \n ENV[\"BLASTDB\"] = \"/home/user/ncbi-blast-2.6.0+/blast/db/\" \n Environment=\"BLASTDB=/home/user/ncbi-blast-2.6.0+/blast/db/\" \n #Protein Metagenomes DB 01 \n %w[ 00 01 ].each do |index| \n 	remote_file \"/home/user/ncbi-blast-2.6.0+/blast/db/env_nr.#{index}.tar.gz\" do \n 	  source \"ftp://ftp.ncbi.nlm.nih.gov/blast/db/env_nr.#{index}.tar.gz\" \n 	  owner \"user\" \n 	  group \"user\" \n 	  mode \"0755\" \n 	  action :create \n 	end \n  \n 	execute \"/home/user/ncbi-blast-2.6.0+/blast/db/\" do \n 	  command \"tar xzvf /home/user/ncbi-blast-2.6.0+/blast/db/env_nr.#{index}.tar.gz -C /home/user/ncbi-blast-2.6.0+/blast/db/\" \n 	end \n  \n 	file \"/home/user/ncbi-blast-2.6.0+/blast/db/env_nr.#{index}.tar.gz\" do \n 	  action :delete \n 	end \n end \n  ' > /etc/chef/cookbooks/blastDB/recipes/default.rb \n \n #Execute chef configuration \n sudo chef-solo -c /etc/chef/solo.rb",
+				"script":"#!bin/bash \n sudo apt-get -y update \n sudo apt-get install -y curl \n #Download Chef installer \n sudo curl -L https://www.opscode.com/chef/install.sh | bash \n #Directory for DB recipe  \n mkdir -p /etc/chef/cookbooks/blastDB/recipes \n #Create chef node.json \n echo '{  \"run_list\": [ \"recipe[blastDB]\"  ]}' > /etc/chef/node.json \n #Define chef paths \n echo 'file_cache_path \"/etc/chef\" \n \t cookbook_path \"/etc/chef/cookbooks\" \n \t json_attribs \"/etc/chef/node.json\"' > /etc/chef/solo.rb \n #Blast DB recipe \n echo '%w[ /home/user/ncbi-blast-2.6.0+ /home/user/ncbi-blast-2.6.0+/blast /home/user/ncbi-blast-2.6.0+/blast/db ].each do |path| \n \t directory path do \n \t owner \"user\" \n\t group \"user\" \n\t mode \"0755\" \n\t end \n end \n ENV[\"BLASTDB\"] = \"/home/user/ncbi-blast-2.6.0+/blast/db/\" \n Environment=\"BLASTDB=/home/user/ncbi-blast-2.6.0+/blast/db/\" \n #Protein Metagenomes DB 01 \n %w[ 00 01 ].each do |index| \n 	remote_file \"/home/user/ncbi-blast-2.6.0+/blast/db/env_nr.#{index}.tar.gz\" do \n 	  source \"ftp://ftp.ncbi.nlm.nih.gov/blast/db/env_nr.#{index}.tar.gz\" \n 	  owner \"user\" \n 	  group \"user\" \n 	  mode \"0755\" \n 	  action :create \n 	end \n  \n 	execute \"/home/user/ncbi-blast-2.6.0+/blast/db/\" do \n 	  command \"tar xzvf /home/user/ncbi-blast-2.6.0+/blast/db/env_nr.#{index}.tar.gz -C /home/user/ncbi-blast-2.6.0+/blast/db/\" \n 	end \n  \n 	file \"/home/user/ncbi-blast-2.6.0+/blast/db/env_nr.#{index}.tar.gz\" do \n 	  action :delete \n 	end \n end \n  ' > /etc/chef/cookbooks/blastDB/recipes/default.rb \n \n #Execute chef configuration \n sudo chef-solo -c /etc/chef/solo.rb \n ssh-keygen -f id_rsa -t rsa -N ''",
 				"dependencies":[""]
 			}
 			{
 				"id":"1",
 				"hwp":"Medium",
 				"imageTemplate":"DebianTemplate",
-				"quantity":"3",
+				"quantity":"2",
 				"gHostName":"ProcessNodes",
-				"script":"#!bin/bash \n sudo apt-get install -y curl#Download Chef installer \n sudo curl -L https://www.opscode.com/chef/install.sh | bash \n #Prepare Chef folders \n mkdir -p /etc/chef/cookbooks/blast/recipes \n #Create blast installer recipe \n echo ' \n apt_package \"ncbi-blast+\" do \n 	action :install \n end' > /etc/chef/cookbooks/blast/recipes/default.rb \n #Create chef node.json \n echo ' \n { \n   \"run_list\": [ \"recipe[blast]\" ] \n }' > /etc/chef/node.json \n #Define chef paths \n echo ' \n   file_cache_path \"/etc/chef\" \n   cookbook_path \"/etc/chef/cookbooks\" \n   json_attribs \"/etc/chef/node.json\"' > /etc/chef/solo.rb \n  \n #FALTA CONFIGURAR EL SMB \n #Execute chef configuration \n sudo chef-solo -c /etc/chef/solo.rb \n ",
+				"script":"#!bin/bash \n sudo apt-get -y update \nsudo apt-get install -y curl \n #Download Chef installer \n sudo curl -L https://www.opscode.com/chef/install.sh | bash \n #Prepare Chef folders \n mkdir -p /etc/chef/cookbooks/blast/recipes \n #Create blast installer recipe \n echo ' \n apt_package \"ncbi-blast+\" do \n 	action :install \n end' > /etc/chef/cookbooks/blast/recipes/default.rb \n #Create chef node.json \n echo ' \n { \n   \"run_list\": [ \"recipe[blast]\" ] \n }' > /etc/chef/node.json \n #Define chef paths \n echo ' \n   file_cache_path \"/etc/chef\" \n   cookbook_path \"/etc/chef/cookbooks\" \n   json_attribs \"/etc/chef/node.json\"' > /etc/chef/solo.rb \n  \n apt-get install -y sshfs \n mkdir /home/user/BlastDB/ \n sshfs -o strictHostKeyChecking=no $DEP_0_0$:/home/user/ncbi-blast-2.6.0+ /home/user/BlastDB/ \n echo 'sshfs#$DEP_0_0$:/home/user/ncbi-blast-2.6.0+ /home/user/BlastDB/ fuse defaults,idmap=user,allow_other,reconnect,_netdev,users' >> /etc/fstab \n echo 'export BLASTDB=/home/user/BlastDB/blast/db' >> /etc/environment   \n #Execute chef configuration \n sudo chef-solo -c /etc/chef/solo.rb \n ",
 				"dependencies":["0"]
 			}
 			

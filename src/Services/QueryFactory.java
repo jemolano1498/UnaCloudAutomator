@@ -14,8 +14,10 @@ import Entities.DeployedImage;
 import Entities.Deployment;
 import Entities.Execution;
 import Entities.NetInterface;
+import Entities.NodeGroup;
 import Entities.PhysicalMachine;
 import Run.FinalStaticsVals;
+import uniandes.unacloud.agent.system.OperatingSystem;
 import uniandes.unacloud.agent.utils.SystemUtils;
 import uniandes.unacloud.web.pmallocators.PhysicalMachineAllocationDescription;
 
@@ -73,10 +75,15 @@ public class QueryFactory {
 					+ "password, platform_id, repository_id, "
 					+ "state, token, user, is_public) "
 					+ "VALUES ("+imageNumber+", 0, \"SSH\","
-							+ " 2311069109, 1, \"2017-11-01 11:52:17\","
-							+ " \""+ imageRoute+"\", \""+ imageName+"\","
-									+ " 6, "+FinalStaticsVals.USERNAME_ID+", \""+FinalStaticsVals.IMAGE_PASSWORD+"\", 1, 1, \"AVAILABLE\","
-									+ " \"NULL\",\""+FinalStaticsVals.IMAGE_USERNAME+"\", \"\");";
+					+ " 2311069109, 1, \"2017-11-01 11:52:17\","
+					+ " \""+ "D:\\\\GRID\\\\repo\\"+ OperatingSystem.PATH_SEPARATOR + imageName + "\\"+ OperatingSystem.PATH_SEPARATOR + imageName + ".vbox"+"\", \""+ imageName+"\","
+							+ " 6, "+FinalStaticsVals.USERNAME_ID+", \""+FinalStaticsVals.IMAGE_PASSWORD+"\", 1, 1, \"AVAILABLE\","
+							+ " \"NULL\",\""+FinalStaticsVals.IMAGE_USERNAME+"\", \"\");";
+//					+ "VALUES ("+imageNumber+", 0, \"SSH\","
+//							+ " 2311069109, 1, \"2017-11-01 11:52:17\","
+//							+ " \""+ imageRoute+ OperatingSystem.PATH_SEPARATOR + imageName + ".vbox"+"\", \""+ imageName+"\","
+//									+ " 6, "+FinalStaticsVals.USERNAME_ID+", \""+FinalStaticsVals.IMAGE_PASSWORD+"\", 1, 1, \"AVAILABLE\","
+//									+ " \"NULL\",\""+FinalStaticsVals.IMAGE_USERNAME+"\", \"\");";
 			
 			PreparedStatement ps = connection.prepareStatement(query);
 			System.out.println(ps.toString());
@@ -137,17 +144,17 @@ public class QueryFactory {
 		
 	}
 	
-	public void addClusterDbId(Cluster cluster) {
+	public void addClusterDbId(NodeGroup nodegroup) {
 		try {
 			String query = 	"select id from cluster "
-					+ "where cluster.name = \""+cluster.name+"\""
+					+ "where cluster.name = \""+nodegroup.gHostName+"\""
 							+ " and cluster.user_id = \""+FinalStaticsVals.USERNAME_ID+"\";";
 			PreparedStatement ps = connection.prepareStatement(query);
 			System.out.println(ps.toString());
 			ResultSet rs = ps.executeQuery();
 			
 			while(rs.next()){
-				cluster.dBId=rs.getString(1);
+				nodegroup.dBId=rs.getString(1);
 			}
 			
 			try {
