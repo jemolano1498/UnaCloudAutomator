@@ -34,7 +34,8 @@ public class PlatformFactory {
     private static Map<String,Platform> map = new HashMap<>();
     
     public static void registerplatforms() {
-    	String vBox = "/usr/lib/virtualbox/VBoxManage";
+//    	String vBox = "/usr/lib/virtualbox/VBoxManage";
+    	String vBox = "C:\\Program Files\\Oracle\\VirtualBox\\VBoxManage.exe";
     	if (vBox != null) {
     		VirtualBox vbox;
 			try {
