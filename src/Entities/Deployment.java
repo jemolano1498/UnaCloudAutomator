@@ -9,7 +9,7 @@ public class Deployment {
 	/**
 	 * Deployed cluster representation 
 	 */
-	public Cluster cluster;
+	public NodeGroup cluster;
 	
 	/**
 	 * start time of the deployment
@@ -31,7 +31,7 @@ public class Deployment {
 	 */
 	public  DeployedImage images;
 
-	public Deployment(Cluster cluster, long duration, String status) {
+	public Deployment(NodeGroup cluster, long duration, String status) {
 		super();
 		this.cluster = cluster;
 		this.duration = duration;
@@ -46,11 +46,11 @@ public class Deployment {
 		this.id = id;
 	}
 
-	public Cluster getCluster() {
+	public NodeGroup getCluster() {
 		return cluster;
 	}
 
-	public void setCluster(Cluster cluster) {
+	public void setCluster(NodeGroup cluster) {
 		this.cluster = cluster;
 	}
 

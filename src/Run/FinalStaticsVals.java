@@ -7,7 +7,9 @@ public class FinalStaticsVals {
 	public static String USERNAME_ID;
 	
 //	public final static String FOLDER_PATH = "/opt/unacloud/repo/";
-	public final static String FOLDER_PATH =  "/home/juanes/VirtualBox VMs/";
+//	public final static String FOLDER_PATH = "C:\\opt\\unacloud\\repo\\";
+	public final static String FOLDER_PATH = "D:\\GRID\\repo\\";
+//	public final static String FOLDER_PATH =  "/home/juanes/VirtualBox VMs/";
 	
 	public final static String IMAGE_NAME = "DebianTemplate";
 	public final static String IMAGE_USERNAME = "root";

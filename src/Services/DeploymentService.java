@@ -11,6 +11,7 @@ import Entities.Deployment;
 import Entities.Execution;
 import Entities.ImageRequest;
 import Entities.NetInterface;
+import Entities.NodeGroup;
 import Entities.PhysicalMachine;
 import uniandes.unacloud.common.enums.TransmissionProtocolEnum;
 import uniandes.unacloud.web.pmallocators.AllocatorEnum;
@@ -43,7 +44,7 @@ public class DeploymentService {
 		deploymentservice = this;
 	}
 
-	public void deploy (Cluster cluster, String user, long time, ImageRequest request ) {
+	public DeployedImage deploy (NodeGroup cluster, String user, long time, ImageRequest request ) {
 		List<PhysicalMachine> pms = new ArrayList<>();
 		pms.addAll(qf.getAllowedMachines());
 		Map<Long, PhysicalMachineAllocationDescription> pmDescriptions = getPhysicalMachineUsage(pms);
@@ -78,7 +79,7 @@ public class DeploymentService {
 		
 		QueueTaskerControl.deployCluster(dep,TransmissionProtocolEnum.getEnum( "TCP"));		
 		
-//		return dep;
+		return depImage;
 		
 	}
 	
