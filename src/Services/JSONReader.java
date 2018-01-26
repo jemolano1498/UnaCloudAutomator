@@ -9,15 +9,22 @@ import org.json.simple.parser.JSONParser;
 
 import Entities.Cluster;
 import Entities.NodeGroup;
-
+/**
+ * 
+ * @author juanes
+ * Class that reads the JSON input
+ */
 public class JSONReader {
 	
+	/**
+	 * JSON file path
+	 */
 	public static String JSON_SOURCE = "out.json";
-	
-	public static String name;
-	
-	public static String time;
 
+	/**
+	 * Method that reads the cluster
+	 * @return mapped cluster
+	 */
 	public Cluster readJson() {
 		
 		Cluster clusterObj = null;
@@ -29,17 +36,26 @@ public class JSONReader {
             JSONObject jsonObject = (JSONObject) obj;
  
             String name = (String) jsonObject.get("name");
-            this.name = name;
+            
             String time = (String) jsonObject.get("time");
-            this.time = time;
                                    
             JSONObject cluster = (JSONObject) jsonObject.get("cluster");
+            
             String clusterId = (String) cluster.get("id");
             
             clusterObj = new Cluster (clusterId);
             
             clusterObj.name = name;
             
+            switch (time) {
+            case "1 Hour": clusterObj.setTime( new Long (3600000));break;
+            case "2 Hour": clusterObj.time = new Long (3600000*2);break;
+            case "4 Hour": clusterObj.time = new Long (3600000*4);break;
+            case "12 Hour": clusterObj.time = new Long (3600000*12);break;
+            default : clusterObj.time = new Long (3600000);
+                
+            }
+                        
             JSONArray clusterNodes = (JSONArray) cluster.get("nodes");
             
             Iterator<JSONObject> iterator = clusterNodes.iterator();

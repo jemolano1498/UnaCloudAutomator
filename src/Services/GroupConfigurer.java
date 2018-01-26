@@ -25,17 +25,38 @@ import uniandes.unacloud.agent.platform.PlatformFactory;
 import uniandes.unacloud.agent.system.OperatingSystem;
 import uniandes.unacloud.agent.utils.SystemUtils;
 
+/**
+ * @author juanes
+ *
+ */
 public class GroupConfigurer {
 	
+	/**
+	 * The Global cluster
+	 */
 	public Cluster cluster;
 	
+	/**
+	 * List of nodegroups and if it has been deployed
+	 */
 	private Map<String, Integer> deploymentsList;
 	
+	/**
+	 * List of nodegroups and its dependencies
+	 */
 	private Map<String, List<String>> dependencies;
 	
+	/**
+	 * Instance of the DB class
+	 */
 	private QueryFactory qf;
 
+	/**
+	 * Method that checks if the deployments has been deployed and if it has dependencies
+	 * @param cluster mapped cluster
+	 */
 	public GroupConfigurer(Cluster cluster) {
+		
 		this.cluster = cluster;
 		
 		deploymentsList = new HashMap<String, Integer>();
@@ -52,38 +73,23 @@ public class GroupConfigurer {
 		
 	}
 
+	/**
+	 * Method that start the process of provisioning and deployment
+	 */
 	public void start() {
-		
-//		try {
-//			qf.verifyDeployment(325,5);
-//		} catch (Exception e) {
-//		}
-//		
-//
-//		SystemUtils.sleep(5000);
-//		
-//		List<String> IPs = qf.getIPs(325);
-//		
-//		for (String a : IPs) {
-//			System.out.println(a);
-//		}
-		
-//		configureGroupWithNoDependencies(cluster.nodeGroups.get(0));
-//		zipFile();
-//		System.out.println(generateGroupScript(cluster.nodeGroups.get(0)).getAbsolutePath());
 		
 		try {
 		while (!allDeployed()) {
 			for (NodeGroup a : cluster.getNodeGroups()) {
 				if (deploymentsList.get(a.getId())==0 && a.getDependencies().isEmpty()) {
 					
-					doGroupThings(a);
+					DeployGroup(a);
 					
 				}
 				else if (deploymentsList.get(a.getId())==0 && dependenciesDeployed(a.getId())) {
 					
 					fixScript (a);
-					doGroupThings(a);
+					DeployGroup(a);
 				}
 			}
 		}
@@ -94,9 +100,14 @@ public class GroupConfigurer {
 		
 	}
 	
-	public void doGroupThings (NodeGroup a) throws Exception {
+	/**
+	 * Method that call the deployment services and checks if it has already been deployed
+	 * @param a Group to be deployed
+	 * @throws Exception In case the deployment fails
+	 */
+	public void DeployGroup (NodeGroup a) throws Exception {
 		
-		DeployedImage depIm = DeploymentService.getInstance().deploy (a, FinalStaticsVals.USERNAME_ID, new Long (3600000), configureGroup(a) );
+		DeployedImage depIm = DeploymentService.getInstance().deploy (a, FinalStaticsVals.USERNAME_ID, cluster.getTime(), configureGroup(a) );
 		
 		qf.verifyDeployment(depIm.id, a.getQuantity());
 		
@@ -111,6 +122,10 @@ public class GroupConfigurer {
 	
 	
 
+	/**
+	 * Method that checks if all nodegroups has been marked as deployed
+	 * @return true if all nodegroups are marked as deployed
+	 */
 	public boolean allDeployed () {
 		for (NodeGroup a : cluster.getNodeGroups()) {
 			if (deploymentsList.get(a.getId())==0){
@@ -120,6 +135,11 @@ public class GroupConfigurer {
 		return true;
 	}
 	
+	/**
+	 * Method that checks if the previous dependencies has been deployed
+	 * @param group Actual nodegroup being deployed
+	 * @return true if all dependencies has been deployed
+	 */
 	public boolean dependenciesDeployed (String group) {
 		
 		for (String a : dependencies.get(group)) {
@@ -130,6 +150,11 @@ public class GroupConfigurer {
 		return true;
 	}
 	
+	/**
+	 * Method that provides the Virtual Machine Image of the nodeGroup being deployed
+	 * @param nodeGroup nodegroup being deployed
+	 * @return Image request of the VMI
+	 */
 	public ImageRequest configureGroup (NodeGroup nodeGroup) {
 		
 		ImageRequest resp = null;
@@ -186,6 +211,10 @@ public class GroupConfigurer {
 		return resp;
 	}
 	
+	/**
+	 * Method that modifies script with the IP's of the dependent groups
+	 * @param a
+	 */
 	private void fixScript(NodeGroup a) {
 		
 		for (String dep:  a.getDependencies()) {
@@ -197,6 +226,12 @@ public class GroupConfigurer {
 		
 	}
 	
+	/**
+	 * method that zip two input files
+	 * @param Route1 route of the first file
+	 * @param Route2 route of the second file
+	 * @param dest destination path
+	 */
 	public void zipFile (String Route1, String Route2, String dest) {
 		
 		String zipFile = dest;
@@ -246,6 +281,11 @@ public class GroupConfigurer {
 		
 	}
 	
+	/**
+	 * Method that generates the script file to be run in the VMI
+	 * @param nodeGroup NodeGroup being deployed
+	 * @return Path of the script file
+	 */
 	public File generateGroupScript (NodeGroup nodeGroup) {
 		String route = "";
 				

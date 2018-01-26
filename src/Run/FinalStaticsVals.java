@@ -2,8 +2,14 @@ package Run;
 
 public class FinalStaticsVals {
 	
+	/**
+	 * Actual Username
+	 */
 	public final static String USERNAME = "je.molano1498";
 	
+	/**
+	 * Actual username ID
+	 */
 	public static String USERNAME_ID;
 	
 //	public final static String FOLDER_PATH = "/opt/unacloud/repo/";

@@ -13,6 +13,8 @@ public class Cluster {
 	public ArrayList<NodeGroup> nodeGroups;
 	
 	public Image image;
+	
+	public long time;
 
 	public Cluster(String id) {
 		super();
@@ -77,6 +79,14 @@ public class Cluster {
 	 */
 	public void setNodeGroups(ArrayList<NodeGroup> nodeGroups) {
 		this.nodeGroups = nodeGroups;
+	}
+
+	public long getTime() {
+		return time;
+	}
+
+	public void setTime(long time) {
+		this.time = time;
 	}
 
 }

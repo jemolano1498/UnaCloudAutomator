@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
-import Entities.Cluster;
 import Entities.DeployedImage;
 import Entities.Deployment;
 import Entities.Execution;
@@ -21,13 +19,26 @@ import uniandes.unacloud.agent.system.OperatingSystem;
 import uniandes.unacloud.agent.utils.SystemUtils;
 import uniandes.unacloud.web.pmallocators.PhysicalMachineAllocationDescription;
 
+/**
+ * @author juanes
+ * Class responsible for the SQL Queries
+ */
 public class QueryFactory {
 	
-	
+	/**
+	 * DB Connection
+	 */
 	private Connection connection;
 	
+	/**
+	 * Singleton attribute
+	 */
 	private static QueryFactory queryFactory;
 	
+	/**
+	 * Initialize the class
+	 * @param conn 
+	 */
 	public QueryFactory (Connection conn) {
 		
 		connection = conn;
@@ -35,12 +46,20 @@ public class QueryFactory {
 		
 	}
 	
+	/**
+	 * Method that returns the singleton attribute
+	 * @return
+	 */
 	public static QueryFactory getInstance() {
 		
 		return queryFactory;
 		
 	}
 	
+	/**
+	 * Method that checks in the database the position of the image to be registered
+	 * @return next Image ID
+	 */
 	public int getNextImage () {
 		int result =0;
 		try {
@@ -66,6 +85,12 @@ public class QueryFactory {
 		return result+1;
 	}
 	
+	/**
+	 * Method that register a new image in the DB
+	 * @param imageName Name of the image to be deployed
+	 * @param imageRoute Path of the image to be deployed
+	 * @param imageNumber ID of the image being deployed
+	 */
 	public void registerImageInDB (String imageName, String imageRoute, int imageNumber) {
 		try {
 			String query = 	"INSERT INTO image (id, version,"
@@ -79,12 +104,6 @@ public class QueryFactory {
 					+ " \""+ "D:\\\\GRID\\\\repo\\"+ OperatingSystem.PATH_SEPARATOR + imageName + "\\"+ OperatingSystem.PATH_SEPARATOR + imageName + ".vbox"+"\", \""+ imageName+"\","
 							+ " 6, "+FinalStaticsVals.USERNAME_ID+", \""+FinalStaticsVals.IMAGE_PASSWORD+"\", 1, 1, \"AVAILABLE\","
 							+ " \"NULL\",\""+FinalStaticsVals.IMAGE_USERNAME+"\", \"\");";
-//					+ "VALUES ("+imageNumber+", 0, \"SSH\","
-//							+ " 2311069109, 1, \"2017-11-01 11:52:17\","
-//							+ " \""+ imageRoute+ OperatingSystem.PATH_SEPARATOR + imageName + ".vbox"+"\", \""+ imageName+"\","
-//									+ " 6, "+FinalStaticsVals.USERNAME_ID+", \""+FinalStaticsVals.IMAGE_PASSWORD+"\", 1, 1, \"AVAILABLE\","
-//									+ " \"NULL\",\""+FinalStaticsVals.IMAGE_USERNAME+"\", \"\");";
-			
 			PreparedStatement ps = connection.prepareStatement(query);
 			System.out.println(ps.toString());
 			System.out.println("\t change " + ps.executeUpdate() + " lines");
@@ -101,6 +120,11 @@ public class QueryFactory {
 		
 	}
 
+	/**
+	 * Method that registers a cluster in the database
+	 * @param clusterName nodegroup being deployed
+	 * @param imageNumber Image ID of the nodegroup being deployed
+	 */
 	public void createCluster(String clusterName,int imageNumber) {
 		try {
 			String query = 	"INSERT INTO cluster (version,"
@@ -123,6 +147,11 @@ public class QueryFactory {
 		asociateCluster(clusterName, imageNumber);
 	}
 	
+	/**
+	 * Create the association betwixt a cluster and its image
+	 * @param clusterName nodegroup id
+	 * @param imageNumber deployed image id
+	 */
 	public void asociateCluster(String clusterName,int imageNumber) {
 		try {
 			String query = 	 "INSERT INTO cluster_image (cluster_images_id, image_id) "
@@ -144,6 +173,10 @@ public class QueryFactory {
 		
 	}
 	
+	/**
+	 * Method that registers a nodegroup in the DB
+	 * @param nodegroup
+	 */
 	public void addClusterDbId(NodeGroup nodegroup) {
 		try {
 			String query = 	"select id from cluster "
@@ -170,6 +203,12 @@ public class QueryFactory {
 		
 	}
 
+	/**
+	 * Method that check in the DB if the deployment has been done
+	 * @param deployedImageId deployed image id
+	 * @param deployedInstances number of deployments
+	 * @throws Exception in case any deployment fails
+	 */
 	public void verifyDeployment(int deployedImageId, int deployedInstances) throws Exception {
 		boolean deployed =false;
 		int iterations = 0;
@@ -206,6 +245,11 @@ public class QueryFactory {
 		
 	}
 
+	/**
+	 * Method that returns a list of a nodegroup IP's
+	 * @param deployedImageId
+	 * @return NodeGroup IP's list
+	 */
 	public List<String> getIPs(int deployedImageId) {
 		
 		List<String> IPs = new ArrayList<String>();
@@ -238,6 +282,10 @@ public class QueryFactory {
 		return IPs;
 	}
 
+	/**
+	 * Method that return the available physical machines
+	 * @return a list of the available physical machines
+	 */
 	public List<PhysicalMachine> getAllowedMachines() {
 		List<PhysicalMachine> physicalMachines = new ArrayList<PhysicalMachine>();
 		
@@ -275,6 +323,12 @@ public class QueryFactory {
 		return physicalMachines;
 	}
 
+	/**
+	 * Method that checks in the DB if there are available physical machines
+	 * @param pmDescriptions
+	 * @param listId
+	 * @return map of physical machines and its id
+	 */
 	public Map<Long, PhysicalMachineAllocationDescription> getUnavailableMachines(Map<Long, PhysicalMachineAllocationDescription> pmDescriptions, String listId) {
 		
 		try {
@@ -304,6 +358,11 @@ public class QueryFactory {
 		
 	}
 
+	/**
+	 * Check in the DB the available IP's
+	 * @param laboratory
+	 * @return list of the available IP's
+	 */
 	public List<String> getAvailableIps(String laboratory) {
 		List<String> IPs = new ArrayList<String>();
 		
@@ -335,6 +394,10 @@ public class QueryFactory {
 		return IPs;
 	}
 
+	/**
+	 * Method that mark an IP as USED
+	 * @param ip ip to be reserved
+	 */
 	public void reserveIp(String ip) {
 		try {
 			String query = 	"update ip "
@@ -358,6 +421,10 @@ public class QueryFactory {
 		
 	}
 
+	/**
+	 * Method that sets an IP as available
+	 * @param ip IP to set free
+	 */
 	public void freeIp(String ip) {
 		try {
 			String query = 	"update ip "
@@ -382,6 +449,11 @@ public class QueryFactory {
 		
 	}
 
+	/**
+	 * Method that checks the ID of the actual user
+	 * @param username
+	 * @return id of the actual user
+	 */
 	public String getUserId(String username) {
 		int result = 0;
 		try {
@@ -407,6 +479,10 @@ public class QueryFactory {
 		return result+"";
 	}
 
+	/**
+	 * Method that register a Deployment un the DB
+	 * @param dep
+	 */
 	public void insertDeploy(Deployment dep) {
 		
 		try {
@@ -439,6 +515,10 @@ public class QueryFactory {
 		addDeployId (dep);
 	}
 	
+	/**
+	 * Method add the DB id of a deployment to the respective class
+	 * @param dep
+	 */
 	public void addDeployId(Deployment dep) {
 		
 		try {
@@ -465,6 +545,11 @@ public class QueryFactory {
 		}
 	}
 
+	/**
+	 * Method that register a Deployed image
+	 * @param depImage
+	 * @param dep
+	 */
 	public void insertDeployedImage(DeployedImage depImage, Deployment dep) {
 		try {
 			String query = 	"INSERT INTO deployed_image (version,"
@@ -492,6 +577,11 @@ public class QueryFactory {
 		
 	}
 	
+	/**
+	 * Method that adds the DB id of a deployed image to its respective class
+	 * @param depImage
+	 * @param dep
+	 */
 	public void addDeployedImageId(DeployedImage depImage, Deployment dep) {
 		
 		try {
@@ -518,6 +608,10 @@ public class QueryFactory {
 		}
 	}
 
+	/**
+	 * Method that registers an execution in the DB
+	 * @param execution
+	 */
 	public void insertExecution(Execution execution) {
 		try {
 			String query = 	"INSERT INTO execution (version,"
@@ -562,6 +656,10 @@ public class QueryFactory {
 		
 	}
 
+	/**
+	 * Method that adds the DB id of an execution to its respective class
+	 * @param execution
+	 */
 	private void addExecutionId(Execution execution) {
 		try {
 			String query = 	"select id from execution "
@@ -588,6 +686,10 @@ public class QueryFactory {
 		
 	}
 
+	/**
+	 * Method that registers a Net Interface in the DB
+	 * @param interfaces
+	 */
 	public void insertNetInterface(NetInterface interfaces) {
 		try {
 			String query = 	"INSERT INTO net_interface (version,"
